@@ -19,25 +19,6 @@
 ## 📁 Project Structure
 
 Create this structure:
-```
-agile-tools/
-├── backend/
-│   ├── main.py
-│   └── requirements.txt
-└── frontend/
-    ├── package.json
-    ├── vite.config.js
-    ├── tailwind.config.js
-    ├── postcss.config.js
-    ├── index.html
-    └── src/
-        ├── main.js
-        ├── style.css
-        ├── App.vue
-        └── components/
-            ├── PlanningPoker.vue
-            └── TeamWheel.vue
-```
 
 ## 🐍 Backend Setup (Python/FastAPI)
 
