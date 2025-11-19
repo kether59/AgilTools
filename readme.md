@@ -1,222 +1,244 @@
-# Agile Tools - Planning Poker & Team Wheel
+# 🚀 Démarrage Rapide - Agile Tools
 
-A containerized application providing two essential agile tools: Planning Poker for estimation and Team Wheel for decision-making.
+## Installation en 5 minutes
 
-## Features
-
-### Planning Poker
-- Create and join estimation sessions
-- Real-time voting with Fibonacci sequence
-- Reveal votes simultaneously
-- Session persistence with SQLite
-- Reset rounds for new estimations
-
-### Team Wheel (Wheel of Decision)
-- Create custom wheel configurations
-- Animated spinning wheel
-- Save configurations for reuse
-- Track recent results
-- Visual selection with canvas animation
-
-## Tech Stack
-
-- **Backend**: Python FastAPI with SQLAlchemy ORM
-- **Frontend**: Vue.js 3 with Composition API + Tailwind CSS
-- **Database**: SQLite
-- **Container**: Docker & Docker Compose
-- **Auth**: OAuth token via x-auth-user header
-
-## Project Structure
-
-```
-agile-tools/
-├── backend/
-│   ├── Dockerfile
-│   ├── main.py
-│   └── requirements.txt
-├── frontend/
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   ├── index.html
-│   └── src/
-│       ├── main.js
-│       ├── style.css
-│       ├── App.vue
-│       └── components/
-│           ├── PlanningPoker.vue
-│           └── TeamWheel.vue
-└── docker-compose.yml
-```
-
-## Setup Instructions
-
-### 1. Create Project Structure
+### 1️⃣ Backend (Terminal 1)
 
 ```bash
-mkdir -p agile-tools/{backend,frontend/src/components}
-cd agile-tools
+# Installer les dépendances
+pip install fastapi uvicorn sqlalchemy pydantic websockets
+
+# Lancer le serveur
+python main.py
 ```
 
-### 2. Backend Setup
+✅ Backend prêt sur http://localhost:8000
 
-Create `backend/main.py`, `backend/requirements.txt`, and `backend/Dockerfile` with the provided code.
-
-### 3. Frontend Setup
-
-Create the following files:
-- `frontend/package.json`
-- `frontend/vite.config.js`
-- `frontend/tailwind.config.js`
-- `frontend/nginx.conf`
-- `frontend/Dockerfile`
-- `frontend/index.html`
-- `frontend/src/main.js`
-- `frontend/src/style.css`
-- `frontend/src/App.vue`
-- `frontend/src/components/PlanningPoker.vue`
-- `frontend/src/components/TeamWheel.vue`
-
-### 4. Docker Compose
-
-Create `docker-compose.yml` at the root level.
-
-### 5. Build and Run
+### 2️⃣ Frontend (Terminal 2)
 
 ```bash
-# Build containers
-docker-compose build
-
-# Start services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-```
-
-### 6. Access the Application
-
-- Frontend: http://localhost
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-## OAuth Integration
-
-The application uses the `x-auth-user` header for authentication. To integrate with your OAuth provider:
-
-1. Configure your OAuth provider to pass the username in the `x-auth-user` header
-2. Update `frontend/src/App.vue` to retrieve the OAuth token and set the header:
-
-```javascript
-// Example: Get username from OAuth token
-const token = getOAuthToken(); // Your OAuth implementation
-const username = parseTokenForUsername(token);
-axios.defaults.headers.common['x-auth-user'] = username;
-```
-
-3. For reverse proxy setup (nginx/traefik), forward the header:
-
-```nginx
-proxy_set_header X-Auth-User $http_x_auth_user;
-```
-
-## API Endpoints
-
-### User Management
-- `GET /api/user/me` - Get current user
-
-### Planning Poker
-- `POST /api/poker/sessions` - Create session
-- `GET /api/poker/sessions/{code}` - Get session details
-- `POST /api/poker/sessions/{code}/vote` - Cast vote
-- `POST /api/poker/sessions/{code}/reveal` - Reveal votes
-- `POST /api/poker/sessions/{code}/reset` - Reset round
-
-### Team Wheel
-- `POST /api/wheel/configs` - Create configuration
-- `GET /api/wheel/configs` - List user configurations
-- `GET /api/wheel/configs/{id}` - Get configuration
-- `POST /api/wheel/results` - Save result
-- `GET /api/wheel/configs/{id}/results` - Get recent results
-
-## Database
-
-The SQLite database (`agile_tools.db`) is stored in a Docker volume and persists between container restarts.
-
-### Tables:
-- `users` - User accounts
-- `poker_sessions` - Planning poker sessions
-- `poker_votes` - Individual votes
-- `wheel_configs` - Wheel configurations
-- `wheel_results` - Spin results
-
-## Development
-
-### Backend Development
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-### Frontend Development
-```bash
+# Créer le projet React avec Vite
+npm create vite@latest frontend -- --template react
 cd frontend
+
+# Installer les dépendances
 npm install
+npm install lucide-react
+
+# Installer Tailwind CSS
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+# Copier le code App.jsx dans src/App.jsx
+
+# Lancer le dev server
 npm run dev
 ```
 
-## Environment Variables
+✅ Frontend prêt sur http://localhost:5173
 
-Create `.env` file for custom configuration:
+### 3️⃣ Configuration Tailwind
 
-```env
-# Backend
-BACKEND_PORT=8000
-DATABASE_URL=sqlite:///./agile_tools.db
+Créer `tailwind.config.js`:
 
-# Frontend
-VITE_API_URL=http://localhost:8000
+```javascript
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
 ```
 
-## Docker Commands
+Modifier `src/index.css`:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+## 🎯 Test Rapide
+
+### Planning Poker
+
+1. Ouvrez http://localhost:5173
+2. Entrez votre nom (ex: "Alice")
+3. Cliquez sur "Planning Poker"
+4. Créez une session: "Sprint 15 Planning"
+5. Copiez le code de session (ex: "abc123xyz")
+6. Ouvrez un onglet privé, connectez-vous comme "Bob"
+7. Rejoignez avec le code
+8. Les deux peuvent maintenant voter !
+
+### Roue de Décision
+
+1. Cliquez sur "Roue de Décision"
+2. "Nouvelle configuration"
+3. Nom: "Équipe Dev"
+4. Items (un par ligne):
+   ```
+   Alice
+   Bob
+   Charlie
+   Diana
+   ```
+5. Sauvegardez
+6. Cliquez "Lancer la roue"
+7. 🎉 Regardez la magie opérer !
+
+## 🔧 Résolution de Problèmes
+
+### ❌ Erreur CORS
+**Problème**: `Access-Control-Allow-Origin error`
+
+**Solution**: Vérifiez que le backend autorise CORS:
+```python
+# Dans main.py - déjà configuré
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # OK pour dev, restreindre en prod
+    ...
+)
+```
+
+### ❌ WebSocket ne connecte pas
+**Problème**: Les votes ne s'affichent pas en temps réel
+
+**Solution**:
+1. Vérifiez que le serveur backend tourne
+2. Testez manuellement: `ws://localhost:8000/ws/poker/test?username=test`
+3. Regardez la console du navigateur
+
+### ❌ Base de données corrompue
+**Problème**: Erreurs SQLAlchemy au démarrage
+
+**Solution**: Supprimez et recréez la DB:
+```bash
+rm agile_tools.db
+python main.py  # Recrée automatiquement
+```
+
+### ❌ Port déjà utilisé
+**Problème**: `Address already in use`
+
+**Solution**:
+```bash
+# Trouver le processus
+lsof -i :8000  # ou :5173
+# Tuer le processus
+kill -9 <PID>
+```
+
+## 📱 Test Mobile
+
+1. Trouvez votre IP locale:
+   ```bash
+   # Windows
+   ipconfig
+   
+   # Mac/Linux
+   ifconfig | grep inet
+   ```
+
+2. Modifiez les URLs dans App.jsx:
+   ```javascript
+   const API_URL = 'http://192.168.1.XXX:8000/api';
+   const WS_URL = 'ws://192.168.1.XXX:8000/ws';
+   ```
+
+3. Accédez depuis votre téléphone: `http://192.168.1.XXX:5173`
+
+## 🐳 Déploiement Docker (Bonus)
+
+```dockerfile
+# Dockerfile.backend
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY main.py .
+CMD ["python", "main.py"]
+```
+
+```dockerfile
+# Dockerfile.frontend
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json .
+RUN npm install
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "preview"]
+```
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+```
+
+Lancer avec:
+```bash
+docker-compose up -d
+```
+
+## 🎓 Prochaines Étapes
+
+1. **Personnalisation**: Modifiez les couleurs dans Tailwind
+2. **Features**: Ajoutez vos propres fonctionnalités
+3. **Production**: Sécurisez l'authentification
+4. **Deploy**: Hébergez sur Vercel (frontend) + Railway (backend)
+
+## 💡 Astuces
+
+- **Dev Tools**: Ouvrez la console (F12) pour voir les logs WebSocket
+- **State**: React DevTools pour debug le state
+- **API**: Testez avec http://localhost:8000/docs (Swagger UI)
+- **Hot Reload**: Les deux serveurs ont le hot reload activé
+
+## ⚡ Raccourcis Utiles
 
 ```bash
-# Stop services
-docker-compose down
+# Backend - tout en un
+pip install -r requirements.txt && python main.py
 
-# Rebuild after changes
-docker-compose up -d --build
+# Frontend - tout en un
+npm install && npm run dev
 
-# View backend logs
-docker-compose logs -f backend
-
-# View frontend logs
-docker-compose logs -f frontend
-
-# Access backend shell
-docker-compose exec backend sh
-
-# Remove volumes (WARNING: deletes database)
-docker-compose down -v
+# Reset complet
+rm -rf node_modules package-lock.json agile_tools.db
+npm install && python main.py
 ```
 
-## Production Considerations
+---
 
-1. **Database**: Replace SQLite with PostgreSQL for production
-2. **Authentication**: Implement proper OAuth2 validation
-3. **HTTPS**: Use SSL certificates and enable HTTPS
-4. **Environment Variables**: Use secrets management
-5. **Logging**: Configure proper logging and monitoring
-6. **Backup**: Implement database backup strategy
-7. **Rate Limiting**: Add rate limiting to API endpoints
+**Bloqué?** Vérifiez que:
+- [ ] Python 3.8+ installé
+- [ ] Node.js 16+ installé
+- [ ] Les deux serveurs tournent
+- [ ] Pas de firewall bloquant les ports
+- [ ] Les URLs sont correctes dans le code
 
-## License
-
-MIT License
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+**Ça marche?** 🎉 Profitez de vos cérémonies agiles !
