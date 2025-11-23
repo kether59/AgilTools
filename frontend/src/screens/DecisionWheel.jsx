@@ -14,7 +14,6 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newConfigName, setNewConfigName] = useState('');
   const [newConfigItems, setNewConfigItems] = useState('');
-  const [showConfetti, setShowConfetti] = useState(false);
   const audioContextRef = useRef(null);
   const api = useAPI();
 
@@ -23,7 +22,7 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
     audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
   }, []);
 
-  // Update sidebar when configs or selected config changes
+  // Update sidebar
   useEffect(() => {
     if (onSidebarUpdate) {
       onSidebarUpdate(
@@ -80,7 +79,6 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
                   onClick={() => {
                     setSelectedConfig(config);
                     setWinner(null);
-                    setShowConfetti(false);
                   }}
                   className="card card-hover"
                   style={{
@@ -177,7 +175,6 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
 
     setIsSpinning(true);
     setWinner(null);
-    setShowConfetti(false);
 
     const items = selectedConfig.items;
     const randomIndex = Math.floor(Math.random() * items.length);
@@ -210,7 +207,7 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
       } else {
         setWinner(items[randomIndex]);
         setIsSpinning(false);
-        setShowConfetti(true);
+        spawnConfetti();
 
         api('/wheel/results', {
           method: 'POST',
@@ -219,35 +216,92 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
             selected_item: items[randomIndex]
           }),
         }).catch(console.error);
-
-        setTimeout(() => setShowConfetti(false), 3000);
       }
     };
 
     animate();
   };
 
+  // CONFETTI BURST FROM CENTER
+  const spawnConfetti = () => {
+    const container = document.getElementById("confetti-container");
+    if (!container) return;
+
+    const count = 80;
+    const colors = WHEEL_COLORS;
+
+    // Center coordinates (adjusted for your wheel)
+    const centerX = window.innerWidth / 2;
+    const wheelElement = document.querySelector("canvas");
+    const rect = wheelElement?.getBoundingClientRect();
+    const centerY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement("div");
+      const size = 6 + Math.random() * 8;
+
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 4 + Math.random() * 6;
+
+      const velocity = {
+        x: Math.cos(angle) * speed,
+        y: Math.sin(angle) * speed,
+      };
+
+      Object.assign(div.style, {
+        position: "fixed",
+        left: `${centerX}px`,
+        top: `${centerY}px`,
+        width: `${size}px`,
+        height: `${size * 0.6}px`,
+        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+        borderRadius: "2px",
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+        opacity: "1",
+        zIndex: "9999",
+      });
+
+      container.appendChild(div);
+
+      let x = centerX;
+      let y = centerY;
+
+      const gravity = 0.15;
+      const decay = 0.98;
+
+      const animateParticle = () => {
+        velocity.x *= decay;
+        velocity.y *= decay;
+        velocity.y += gravity;
+
+        x += velocity.x;
+        y += velocity.y;
+
+        div.style.left = `${x}px`;
+        div.style.top = `${y}px`;
+        div.style.opacity = `${parseFloat(div.style.opacity) - 0.01}`;
+
+        if (parseFloat(div.style.opacity) <= 0) {
+          div.remove();
+        } else {
+          requestAnimationFrame(animateParticle);
+        }
+      };
+
+      requestAnimationFrame(animateParticle);
+    }
+  };
+
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none z-50">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: '-10%',
-                width: '10px',
-                height: '10px',
-                backgroundColor: WHEEL_COLORS[Math.floor(Math.random() * WHEEL_COLORS.length)],
-                animationDelay: `${Math.random() * 0.5}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
-            />
-          ))}
-        </div>
-      )}
+
+      {/* Confetti container ALWAYS mounted */}
+      <div
+        id="confetti-container"
+        className="fixed inset-0 pointer-events-none z-50"
+        style={{ overflow: "hidden" }}
+      />
 
       {!selectedConfig ? (
         <div className="content-section text-center">
@@ -255,7 +309,7 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
             <h3 className="content-section-title">🎡 Decision Wheel</h3>
           </div>
           <p className="text-gray-600 text-lg">
-            Select a configration in the right panel to start
+            Select a configuration in the right panel to start
           </p>
         </div>
       ) : (
@@ -267,7 +321,7 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
               </h3>
             </div>
 
-            <div className="relative flex justify-center items-center mb-8">
+            <div className="relative flex justify-center items-center mb-8 w-full">
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-6 z-20">
                 <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-red-600 filter drop-shadow-lg" />
               </div>
@@ -315,41 +369,6 @@ export const DecisionWheel = ({ onSidebarUpdate }) => {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes confetti {
-          0% {
-            transform: translateY(0) rotateZ(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotateZ(720deg);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes bounce-in {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          50% {
-            transform: scale(1.1);
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        
-        .animate-confetti {
-          animation: confetti linear forwards;
-        }
-        
-        .animate-bounce-in {
-          animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-      `}</style>
     </div>
   );
 };

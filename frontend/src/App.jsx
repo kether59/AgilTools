@@ -6,7 +6,7 @@ import { HomeScreen } from './screens/HomeScreen';
 import { PokerSelection } from './screens/PokerSelection';
 import { DecisionWheel } from './screens/DecisionWheel';
 import { PokerSession } from './screens/PokerSession';
-import './index.css'
+import './App.css'
 
 const AppHeader = ({ currentView, onNavigateHome, username }) => {
   const getPageTitle = () => {
@@ -104,7 +104,7 @@ const AppContent = () => {
     }
   };
 
-  const showSidebar = currentView === 'poker' && pokerSessionCode;
+  const showSidebar = (currentView === 'poker' && pokerSessionCode) || currentView == 'wheel';
 
   return (
     <div className="app-container">
